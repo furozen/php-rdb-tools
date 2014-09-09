@@ -79,6 +79,7 @@ if (!empty($types)){
         }
 
     }
+
 }
 $outputFilename = 'php://stdout';
 if(!empty($file)){

@@ -1,13 +1,7 @@
-[{read object abcd
-
-"abcd":"efgh"read object foo
-,
-"foo":"bar"read object bar
-,
-"bar":"baz"read object abcdef
-,
-"abcdef":"abcdef"read object longerstring
-,
-"longerstring":"thisisalongerstring.idontknowwhatitmeans"read object abc
-,
+[{
+"abcd":"efgh",
+"foo":"bar",
+"bar":"baz",
+"abcdef":"abcdef",
+"longerstring":"thisisalongerstring.idontknowwhatitmeans",
 "abc":"def"}]

@@ -57,13 +57,10 @@ function _rplce($match)
 function _encode_basestring_ascii($s)
 {
 
-    try {
-        if (is_string($s) && HAS_UTF8($s))
-            $s = utf8_encode($s);
-    } catch (Exception $e) {
-    }
+    $s=json_encode($s);
 
-    return preg_replace_callback('/([\\"]|[^\ -~])/', "_rplce", $s);
+
+    return $s;
 
 }
 
@@ -109,8 +106,16 @@ class JSONCallback extends RdbCallback
 {
 
 
-    public function __init__($out)
+    public function __construct($out)
     {
+
+        if(!is_resource($out)){
+            try{
+                $out = fopen($out,'w');
+            }catch (Exception $e){
+                throw new Exception('It need resource or correct path',$e->getCode(),$e);
+            }
+        }
         $this->_out = $out;
         $this->_is_first_db = true;
         $this->_has_databases = false;
@@ -121,14 +126,14 @@ class JSONCallback extends RdbCallback
 
     public function start_rdb()
     {
-        $this->_out->write('[');
+        fwrite($this->_out,'[');
     }
 
     public function start_database($db_number)
     {
         if (!$this->_is_first_db)
-            $this->_out->write('},');
-        $this->_out->write('{');
+            fwrite($this->_out,'},');
+        fwrite($this->_out,'{');
         $this->_is_first_db = false;
         $this->_has_databases = true;
         $this->_is_first_key_in_db = true;
@@ -142,15 +147,15 @@ class JSONCallback extends RdbCallback
     public function end_rdb()
     {
         if ($this->_has_databases)
-            $this->_out->write('}');
-        $this->_out->write(']');
+            fwrite($this->_out,'}');
+        fwrite($this->_out,']');
     }
 
     public function _start_key($key, $length)
     {
         if (!$this->_is_first_key_in_db)
-            $this->_out->write(',');
-        $this->_out->write('\r\n');
+            fwrite($this->_out,',');
+        fwrite($this->_out,"\r\n");
         $this->_is_first_key_in_db = false;
         $this->_elements_in_key = $length;
         $this->_element_index = 0;
@@ -164,85 +169,85 @@ class JSONCallback extends RdbCallback
     public function _write_comma()
     {
         if ($this->_element_index > 0 and $this->_element_index < $this->_elements_in_key)
-            $this->_out->write(',');
+            fwrite($this->_out,',');
         $this->_element_index = $this->_element_index + 1;
     }
 
     public function set($key, $value, $expiry, $info)
     {
         $this->_start_key($key, 0);
-        $this->_out->write(sprintf('%s:%s', encode_key($key), encode_value($value)));
+        fwrite($this->_out,sprintf('%s:%s', encode_key($key), encode_value($value)));
     }
 
     public function start_hash($key, $length, $expiry, $info)
     {
         $this->_start_key($key, $length);
-        $this->_out->write(sprintf('%s:{', encode_key($key)));
+        fwrite($this->_out,sprintf('%s:{', encode_key($key)));
     }
 
     public function hset($key, $field, $value)
     {
         $this->_write_comma();
-        $this->_out->write(sprintf('%s:%s', encode_key($field), encode_value($value)));
+        fwrite($this->_out,sprintf('%s:%s', encode_key($field), encode_value($value)));
     }
 
     public function end_hash($key)
     {
         $this->_end_key($key);
-        $this->_out->write('}');
+        fwrite($this->_out,'}');
     }
 
     public function start_set($key, $cardinality, $expiry, $info)
     {
         $this->_start_key($key, $cardinality);
-        $this->_out->write(sprintf('%s:[', encode_key($key)));
+        fwrite($this->_out,sprintf('%s:[', encode_key($key)));
     }
 
     public function sadd($key, $member)
     {
         $this->_write_comma();
-        $this->_out->write(sprintf('%s', encode_value($member)));
+        fwrite($this->_out,sprintf('%s', encode_value($member)));
     }
 
     public function end_set($key)
     {
         $this->_end_key($key);
-        $this->_out->write(']');
+        fwrite($this->_out,']');
     }
 
     public function start_list($key, $length, $expiry, $info)
     {
         $this->_start_key($key, $length);
-        $this->_out->write(sprintf('%s:[', encode_key($key)));
+        fwrite($this->_out,sprintf('%s:[', encode_key($key)));
     }
 
     public function rpush($key, $value)
     {
         $this->_write_comma();
-        $this->_out->write(sprintf('%s', encode_value($value)));
+        fwrite($this->_out,sprintf('%s', encode_value($value)));
     }
 
     public function end_list($key)
     {
         $this->_end_key($key);
-        $this->_out->write(']');
+        fwrite($this->_out,']');
     }
 
     public function start_sorted_set($key, $length, $expiry, $info)
     {
         $this->_start_key($key, $length);
-        $this->_out->write(sprintf('%s:{', encode_key($key)));
+        fwrite($this->_out,sprintf('%s:{', encode_key($key)));
     }
 
     public function zadd($key, $score, $member)
     {
         $this->_write_comma();
-        $this->_out->write(sprintf('%s:%s', encode_key($member), encode_value($score)));
+        fwrite($this->_out,sprintf('%s:%s', encode_key($member), encode_value($score)));
     }
 
     public function end_sorted_set($key)
     {
         $this->_end_key($key);
-        $this->_out->write('}');
+        fwrite($this->_out,'}');
     }
 }
