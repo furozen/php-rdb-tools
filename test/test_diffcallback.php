@@ -1,19 +1,18 @@
 <?php
 /**
  * Created by Andy Malahovsky
- * Date: 08.09.14
- * Time: 11:47
+ * Date: 18.09.14
+ * Time: 10:42
  */
-
 
 require_once('simpletest/autorun.php');
 
 
 
+require_once  realpath(__DIR__.'/../rdbtools/RDBParser.php');
+require_once  realpath(__DIR__.'/../rdbtools/callbacks.php');
 
-require_once  realpath(__DIR__.'/../rdbtools/ProtocolCallback.php');
-
-class TestProtocolCallback extends UnitTestCase
+class TestDIFFCallback extends UnitTestCase
 {
 
     function test_empty_rdb() {
@@ -56,6 +55,8 @@ class TestProtocolCallback extends UnitTestCase
         $file_name='zipmap_with_big_values.rdb';
         $this->base_test($file_name);
     }
+
+
 
     function test_hash_as_ziplist() {
         $file_name='hash_as_ziplist.rdb';
@@ -108,7 +109,7 @@ class TestProtocolCallback extends UnitTestCase
         $this->base_test($file_name);
     }
     function test_regular_sorted_set() {
-       $file_name='regular_sorted_set.rdb';
+        $file_name='regular_sorted_set.rdb';
         $this->base_test($file_name);
     }
 
@@ -134,11 +135,8 @@ class TestProtocolCallback extends UnitTestCase
     }
 
 
-
-
-
     public function load_rdb($file_name, $filters = '') {
-        $r = new ProtocolCallback($this->getOutFileName($file_name));
+        $r = new DiffCallback($this->getOutFileName($file_name));
         $parser = new RdbParser($r, $filters);
         $parser->parse($this->getDumpsPath() . $file_name);
         fclose($r->_out);
@@ -159,11 +157,11 @@ class TestProtocolCallback extends UnitTestCase
      */
     private function getOutFileName($file_name)
     {
-        return $this->getDumpsPath() . $file_name . '.t.protocol';
+        return $this->getDumpsPath() . $file_name . '.t.diff';
     }
     private function getExpectFileName($file_name)
     {
-        return $this->getDumpsPath() . $file_name . '.protocol';
+        return $this->getDumpsPath() . $file_name . '.diff';
     }
 
     /**
@@ -183,4 +181,5 @@ class TestProtocolCallback extends UnitTestCase
 
         };
     }
+
 }

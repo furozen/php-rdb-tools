@@ -432,7 +432,9 @@ class RdbParser
                 $dbl_length = read_unsigned_char($f);
                 $score = fread($f, $dbl_length);
 
-                $score = (float)$score;
+                if(is_string($score)){
+                    $score = (float)$score;
+                }
 
                 $this->_callback->zadd($this->_key, $score, $val);
             }
@@ -576,7 +578,9 @@ class RdbParser
             $member = $this->read_ziplist_entry($buff);
             $score = $this->read_ziplist_entry($buff);
 
-            $score = (float)$score;
+            if(is_string($score)){
+                $score = (float)$score;
+            }
 
             $this->_callback->zadd($this->_key, $score, $member);
         }

@@ -251,3 +251,6 @@ class JSONCallback extends RdbCallback
         fwrite($this->_out,'}');
     }
 }
+
+
+require_once('DiffCallback.php');

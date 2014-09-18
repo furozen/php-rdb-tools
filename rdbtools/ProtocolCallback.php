@@ -152,6 +152,9 @@ class ProtocolCallback extends RdbCallback
 
     function zadd($key, $score, $member)
     {
+        if(is_float($score) && strpos($score,'.')===false){
+            $score.='.0';
+        }
         $this->emit('ZADD', $key, $score, $member);
     }
 

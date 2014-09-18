@@ -118,6 +118,11 @@ class TestJSONCallback extends UnitTestCase
         $this->base_test($file_name);
     }
 
+    function test_uncompressible_string_keys() {
+        $file_name='uncompressible_string_keys.rdb';
+        $this->base_test($file_name);
+    }
+
 
 
 
